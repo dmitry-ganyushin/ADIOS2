@@ -11,9 +11,27 @@
 
 #include "ADIOSTypes.h"
 
+Options* Options::instance = 0;
+Options* Options::getInstance()
+{
+    if (instance == 0)
+    {
+        instance = new Options();
+    }
+
+    return instance;
+}
+
+Options::Options()
+{}
+void Options::SetThreads(unsigned int arg) {
+    Threads = arg;
+}
+unsigned int Options::GetThreads() {
+    return Threads;
+}
 namespace adios2
 {
-
 std::string ToString(ShapeID value)
 {
     switch (value)

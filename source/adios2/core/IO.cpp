@@ -263,9 +263,14 @@ void IO::SetParameter(const std::string key, const std::string value) noexcept
 }
 void IO::CheckParameters(const std::string key, const std::string value)
 {
-    if (key == "profile")
+    std::string hint = "CheckParameters";
+    Options* opt = Options::getInstance();
+    if (key == "threads")
     {
-        // handle bool
+         unsigned int Threads =
+            static_cast<unsigned int>(helper::StringTo<uint32_t>(
+                value, " in Parameter key=Threads " + hint));
+         opt->SetThreads(Threads);
     }
     else if (key == "profileunits")
     {

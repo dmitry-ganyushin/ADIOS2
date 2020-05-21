@@ -51,6 +51,9 @@ void BPBase::Init(const Params &parameters, const std::string hint,
     bool profileValue;
     bool subStreamsPresent = false;
     int32_t subStreamsValue;
+    /* how to get parameters */
+    Options* opt = Options::getInstance();
+    unsigned int Threads = opt->GetThreads();
     for (const auto &parameter : parameters)
     {
         const std::string key = helper::LowerCase(parameter.first);

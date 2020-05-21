@@ -29,6 +29,23 @@
 
 #include "adios2/common/ADIOSConfig.h"
 
+class Options
+{
+private:
+    /** might be used in large payload copies to buffer */
+    unsigned int Threads = 1;
+
+    static Options * instance;
+
+
+    Options();
+
+public:
+    static Options* getInstance();
+    void SetThreads(unsigned int arg);
+    unsigned int GetThreads();
+};
+
 namespace adios2
 {
 
