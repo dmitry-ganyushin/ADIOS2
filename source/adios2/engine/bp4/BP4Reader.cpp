@@ -149,7 +149,7 @@ void BP4Reader::Init()
                                     m_Name + " " + m_EndMessage);
     }
 
-    m_BP4Deserializer.Init(m_IO.m_Parameters, "in call to BP4::Open to write");
+    m_BP4Deserializer.Init(m_IO.allParameters, m_IO.m_Parameters, "in call to BP4::Open to write");
     InitTransports();
 
     /* Do a collective wait for the file(s) to appear within timeout.

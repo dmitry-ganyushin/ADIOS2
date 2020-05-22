@@ -312,7 +312,7 @@ StepStatus SstReader::BeginStep(StepMode Mode, const float timeout_sec)
         //   (and to the control plane).)
 
         m_BP3Deserializer = new format::BP3Deserializer(m_Comm);
-        m_BP3Deserializer->Init(m_IO.m_Parameters,
+        m_BP3Deserializer->Init(m_IO.allParameters, m_IO.m_Parameters,
                                 "in call to BP3::Open for reading", "sst");
 
         m_BP3Deserializer->m_Metadata.Resize(

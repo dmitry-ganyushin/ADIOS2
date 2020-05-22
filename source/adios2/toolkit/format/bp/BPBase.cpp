@@ -42,7 +42,7 @@ BPBase::BPBase(helper::Comm const &comm) : m_Comm(comm)
     m_Profiler.m_IsActive = true; // default
 }
 
-void BPBase::Init(const Params &parameters, const std::string hint,
+void BPBase::Init( const adiosParameters &allParameters, const Params &parameters, const std::string hint,
                   const std::string engineType)
 {
     // Parse Parameters

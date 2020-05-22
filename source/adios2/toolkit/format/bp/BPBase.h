@@ -292,7 +292,7 @@ public:
      * Init base don parameters passed from the user to IO
      * @param parameters input parameters
      */
-    void Init(const Params &parameters, const std::string hint,
+    void Init(const adiosParameters &allParameters, const Params &parameters, const std::string hint,
               const std::string engineType = "");
     /****************** NEED to check if some are virtual */
 
