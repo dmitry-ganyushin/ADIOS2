@@ -261,18 +261,156 @@ void IO::SetParameter(const std::string key, const std::string value) noexcept
     }
     m_Parameters[key] = value;
 }
+
 void IO::CheckParameters(const std::string key, const std::string value)
 {
+    std::string hint = "parameters check";
     if (key == "profile")
     {
-        // handle bool
+        //profilePresent = true;
+        //profileValue = helper::StringTo<bool>(
+        //    value, " in Parameter key=Profile " + hint);
     }
     else if (key == "profileunits")
     {
-            // handle double
+        allParameters.ProfileUnit =
+            helper::StringToTimeUnit(value, hint);
     }
+    else if (key == "opentimeoutsecs")
+    {
+        allParameters.OpenTimeoutSecs = helper::StringTo<float>(
+            value, " in Parameter key=OpenTimeOutSecs " + hint);
+
+        if (allParameters.OpenTimeoutSecs < 0.0)
+        {
+            allParameters.OpenTimeoutSecs =
+                std::numeric_limits<float>::max() / 10000;
+        }
+    }
+    else if (key == "beginsteppollingfrequencysecs")
+    {
+        allParameters.BeginStepPollingFrequencySecs =
+            helper::StringTo<float>(
+                value, " in Parameter key=OpenTimeOutSecs " + hint);
+
+        if (allParameters.BeginStepPollingFrequencySecs < 0.0)
+        {
+            allParameters.BeginStepPollingFrequencySecs =
+                1.0; // a second
+        }
+        allParameters.BeginStepPollingFrequencyIsSet = true;
+    }
+    else if (key == "buffergrowthfactor")
+    {
+        allParameters.GrowthFactor = helper::StringTo<float>(
+            value, " in Parameter key=BufferGrowthFactor " + hint);
+    }
+    else if (key == "initialbuffersize")
+    {
+        // it will resize m_Data
+        allParameters.InitialBufferSize = helper::StringToByteUnits(
+            value, "for Parameter key=InitialBufferSize, in call to Open");
+
+        if (allParameters.InitialBufferSize <
+            DefaultInitialBufferSize) // 16384b
+        {
+            throw std::invalid_argument(
+                "ERROR: wrong value for Parameter key=InitialBufferSize, "
+                "it must be larger than 16Kb (minimum default), " +
+                hint);
+        }
+    }
+    else if (key == "maxbuffersize")
+    {
+        allParameters.MaxBufferSize = helper::StringToByteUnits(
+            value, "for Parameter key=MaxBufferSize, in call to Open");
+    }
+    else if (key == "threads")
+    {
+        allParameters.Threads =
+            static_cast<unsigned int>(helper::StringTo<uint32_t>(
+                value, " in Parameter key=Threads " + hint));
+    }
+    else if (key == "asynctasks")
+    {
+        allParameters.AsyncTasks = helper::StringTo<bool>(
+            value, " in Parameter key=AsyncTasks " + hint);
+    }
+    else if (key == "statslevel")
+    {
+        allParameters.StatsLevel =
+            static_cast<unsigned int>(helper::StringTo<uint32_t>(
+                value, " in Parameter key=StatsLevel " + hint));
+        if (allParameters.StatsLevel > 5)
+        {
+            throw std::invalid_argument(
+                "ERROR: value for Parameter key=StatsLevel must be "
+                "an integer in the range [0,5], " +
+                hint);
+        }
+    }
+    else if (key == "statsblocksize")
+    {
+        allParameters.StatsBlockSize = helper::StringToSizeT(
+            value, " in Parameter key=StatsBlockSize " + hint);
+    }
+    else if (key == "collectivemetadata")
+    {
+        allParameters.CollectiveMetadata = helper::StringTo<bool>(
+            value, " in Parameter key=CollectiveMetadata " + hint);
+    }
+    else if (key == "flushstepscount")
+    {
+        allParameters.FlushStepsCount = helper::StringToSizeT(
+            value, " in Parameter key=FlushStepsCount " + hint);
+    }
+    else if (key == "substreams")
+    {
+        int subStreams = static_cast<int>(helper::StringTo<int32_t>(
+            value, " in Parameter key=SubStreams " + hint));
+
+        if (subStreams < 1)
+        {
+            subStreams = 1;
+        }
+#if 0
+        else if (subStreams > m_SizeMPI)
+        {
+            subStreams = m_SizeMPI;
+        }
+
+        if (subStreams < m_SizeMPI)
+        {
+            subStreamsPresent = true;
+            subStreamsValue = subStreams;
+        }
+#endif
+    }
+    else if (key == "node-local" || key == "nodelocal")
+    {
+        allParameters.NodeLocal = helper::StringTo<bool>(
+            value, " in Parameter key=NodeLocal " + hint);
+    }
+    else if (key == "burstbufferpath")
+    {
+        allParameters.BurstBufferPath =
+            helper::RemoveTrailingSlash(value);
+    }
+    else if (key == "burstbufferdrain")
+    {
+        allParameters.BurstBufferDrain = helper::StringTo<bool>(
+            value, " in Parameter key=BurstBufferDrain " + hint);
+    }
+    else if (key == "burstbufferverbose")
+    {
+        allParameters.BurstBufferVerbose =
+            static_cast<int>(helper::StringTo<int32_t>(
+                value, " in Parameter key=BurstBufferVerbose " + hint));
+    }
+
     return;
 }
+
 Params &IO::GetParameters() noexcept { return m_Parameters; }
 
 void IO::ClearParameters() noexcept

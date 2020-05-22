@@ -79,7 +79,8 @@ public:
 
     /** From SetParameter, parameters for a particular engine from m_Type */
     Params m_Parameters;
-
+    /** structure to keep all paramers of ADIOS in one place */
+    adiosParameters allParameters;
     /** From AddTransport, parameters in map for each transport in vector */
     std::vector<Params> m_TransportsParameters;
 

@@ -188,6 +188,68 @@ using Params = std::map<std::string, std::string>;
 using vParams = std::vector<std::pair<std::string, Params>>;
 using Steps = size_t;
 
+/** groups all user-level parameters in a single struct */
+struct adiosParameters
+{
+    /** Parameter to flush transports at every number of steps, to be used
+     * at EndStep */
+    size_t FlushStepsCount = 1;
+
+    /** initial buffer size */
+    size_t InitialBufferSize = DefaultInitialBufferSize;
+
+    /** max buffer size */
+    size_t MaxBufferSize = DefaultMaxBufferSize;
+
+    /**
+     * sub-block size for min/max calculation of large arrays in number of
+     * elements (not bytes). The default big number per Put() default will
+     * result in the original single min/max value-pair per block
+     */
+    size_t StatsBlockSize = 1125899906842624;
+
+    /** buffer memory growth factor */
+    float GrowthFactor = DefaultBufferGrowthFactor;
+
+    /** open timeout seconds BP4Only */
+    float OpenTimeoutSecs = 0.f;
+
+    /** Timeout for BeginStep in read. Set by the user as parameter
+     * default value is calculated from the timeout value  */
+    float BeginStepPollingFrequencySecs = 1.f;
+
+    /** statistics verbosity, only 1 (BP4) is supported */
+    unsigned int StatsLevel = 1;
+
+    /** might be used in large payload copies to buffer */
+    unsigned int Threads = 1;
+
+    /** default time unit in m_Profiler */
+    TimeUnit ProfileUnit = DefaultTimeUnitEnum;
+
+    /** true: run as much local tasks in the background,
+     * false: all serial operations */
+    bool AsyncTasks = true;
+
+    /** true: write collective metadata, false: skip */
+    bool CollectiveMetadata = true;
+
+    /** true: NVMex each rank creates its own directory */
+    bool NodeLocal = false;
+
+    /** true: BeginStepPollingFrequency parameter is set */
+    bool BeginStepPollingFrequencyIsSet = false;
+
+    /** Burst buffer base path */
+    std::string BurstBufferPath;
+
+    /** Drain the file from Burst Buffer to the original path
+     *  Relevant only if BurstBufferPath is set */
+    bool BurstBufferDrain = true;
+    /** Verbose level for burst buffer draining thread */
+    int BurstBufferVerbose = 0;
+};
+
 template <class T>
 using Box = std::pair<T, T>;
 
