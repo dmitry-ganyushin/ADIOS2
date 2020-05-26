@@ -62,7 +62,7 @@ std::string BPSerializer::GetRankProfilingJSON(
     std::replace(timeDate.begin(), timeDate.end(), ' ', '_');
 
     rankLog += "\"start\": \"" + timeDate + "\", ";
-    rankLog += "\"threads\": " + std::to_string(m_Parameters.Threads) + ", ";
+    rankLog += "\"threads\": " + std::to_string(allParameters.Threads) + ", ";
     rankLog +=
         "\"bytes\": " + std::to_string(profiler.m_Bytes.at("buffering")) + ", ";
 
@@ -677,7 +677,7 @@ void BPSerializer::MergeSerializeIndices(
     };
 
     // BODY OF FUNCTION STARTS HERE
-    if (m_Parameters.Threads == 1) // enforcing serial version for now
+    if (allParameters.Threads == 1) // enforcing serial version for now
     {
         for (const auto &rankIndices : nameRankIndices)
         {
@@ -688,12 +688,12 @@ void BPSerializer::MergeSerializeIndices(
 
     const size_t elements = nameRankIndices.size();
     const size_t stride =
-        elements / m_Parameters.Threads; // elements per thread
+        elements / allParameters.Threads; // elements per thread
     const size_t last =
-        stride + elements % m_Parameters.Threads; // remainder to last
+        stride + elements % allParameters.Threads; // remainder to last
 
     std::vector<std::thread> threads;
-    threads.reserve(m_Parameters.Threads);
+    threads.reserve(allParameters.Threads);
 
     // copy names in order to use threads
     std::vector<std::string> names;
@@ -704,12 +704,12 @@ void BPSerializer::MergeSerializeIndices(
         names.push_back(nameRankIndexPair.first);
     }
 
-    for (unsigned int t = 0; t < m_Parameters.Threads; ++t)
+    for (unsigned int t = 0; t < allParameters.Threads; ++t)
     {
         const size_t start = stride * t;
         size_t end = start + stride;
 
-        if (t == m_Parameters.Threads - 1)
+        if (t == allParameters.Threads - 1)
         {
             end = start + last;
         }

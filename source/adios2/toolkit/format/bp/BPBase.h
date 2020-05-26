@@ -242,6 +242,8 @@ public:
 
     /** contains user level parameters */
     Parameters m_Parameters;
+    /* struct for storing all parameters */
+    adiosParameters allParameters;
 
     /** true: Close was called, Engine will call this many times for different
      * transports */

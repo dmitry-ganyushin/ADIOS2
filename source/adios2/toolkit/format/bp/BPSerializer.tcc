@@ -85,7 +85,7 @@ inline void BPSerializer::PutPayloadInBuffer(
     {
         helper::CopyToBufferThreads(m_Data.m_Buffer, m_Data.m_Position,
                                     blockInfo.Data, blockSize,
-                                    m_Parameters.Threads);
+                                    allParameters.Threads);
     }
     m_Profiler.Stop("memcpy");
     m_Data.m_AbsolutePosition += blockSize * sizeof(T); // payload size

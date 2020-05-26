@@ -137,7 +137,7 @@ void BP4Serializer::PutSpanMetadata(
     const typename core::Variable<T>::Info &blockInfo,
     const typename core::Variable<T>::Span &span) noexcept
 {
-    if (m_Parameters.StatsLevel > 0)
+    if (allParameters.StatsLevel > 0)
     {
         // Get Min/Max from populated data
         m_Profiler.Start("minmax");
@@ -145,12 +145,12 @@ void BP4Serializer::PutSpanMetadata(
         stats.Min = {};
         stats.Max = {};
         stats.SubBlockInfo =
-            helper::DivideBlock(blockInfo.Count, m_Parameters.StatsBlockSize,
+            helper::DivideBlock(blockInfo.Count, allParameters.StatsBlockSize,
                                 helper::BlockDivisionMethod::Contiguous);
         // set stats MinMaxs with the correct size
         helper::GetMinMaxSubblocks(span.Data(), blockInfo.Count,
                                    stats.SubBlockInfo, stats.MinMaxs, stats.Min,
-                                   stats.Max, m_Parameters.Threads);
+                                   stats.Max, allParameters.Threads);
         m_Profiler.Stop("minmax");
 
         // Put min/max blocks in variable index
@@ -335,17 +335,17 @@ BP4Serializer::GetBPStats(const bool singleValue,
     stats.FileIndex = GetFileIndex();
 
     // support span
-    if (blockInfo.Data == nullptr && m_Parameters.StatsLevel > 0)
+    if (blockInfo.Data == nullptr && allParameters.StatsLevel > 0)
     {
         stats.Min = {};
         stats.Max = {};
         stats.SubBlockInfo =
-            helper::DivideBlock(blockInfo.Count, m_Parameters.StatsBlockSize,
+            helper::DivideBlock(blockInfo.Count, allParameters.StatsBlockSize,
                                 helper::BlockDivisionMethod::Contiguous);
         // set stats MinMaxs with the correct size
         helper::GetMinMaxSubblocks(blockInfo.Data, blockInfo.Count,
                                    stats.SubBlockInfo, stats.MinMaxs, stats.Min,
-                                   stats.Max, m_Parameters.Threads);
+                                   stats.Max, allParameters.Threads);
         return stats;
     }
 
@@ -357,17 +357,17 @@ BP4Serializer::GetBPStats(const bool singleValue,
         return stats;
     }
 
-    if (m_Parameters.StatsLevel > 0)
+    if (allParameters.StatsLevel > 0)
     {
         m_Profiler.Start("minmax");
         if (blockInfo.MemoryStart.empty())
         {
             stats.SubBlockInfo = helper::DivideBlock(
-                blockInfo.Count, m_Parameters.StatsBlockSize,
+                blockInfo.Count, allParameters.StatsBlockSize,
                 helper::BlockDivisionMethod::Contiguous);
             helper::GetMinMaxSubblocks(
                 blockInfo.Data, blockInfo.Count, stats.SubBlockInfo,
-                stats.MinMaxs, stats.Min, stats.Max, m_Parameters.Threads);
+                stats.MinMaxs, stats.Min, stats.Max, allParameters.Threads);
         }
         else
         {
@@ -601,7 +601,7 @@ void BP4Serializer::PutBoundsRecord(const bool singleValue,
     }
     else
     {
-        if (m_Parameters.StatsLevel > 0) // default verbose
+        if (allParameters.StatsLevel > 0) // default verbose
         {
             // Record entire Min-Max subblock arrays
             const uint8_t id = characteristic_minmax;
@@ -654,7 +654,7 @@ void BP4Serializer::PutBoundsRecord(const bool singleValue,
     }
     else
     {
-        if (m_Parameters.StatsLevel > 0) // default min and max only
+        if (allParameters.StatsLevel > 0) // default min and max only
         {
             // Record entire Min-Max subblock arrays
             const uint8_t id = characteristic_minmax;
@@ -783,7 +783,7 @@ void BP4Serializer::PutVariableCharacteristics(
         // come after dimensions characteristics
 
         // TODO conflict between BP3 and BP4 with Span
-        if (m_Parameters.StatsLevel > 0 && span != nullptr)
+        if (allParameters.StatsLevel > 0 && span != nullptr)
         {
             // store the characteristic position to be filled by PutSpanMetadata
             span->m_MinMaxMetadataPositions.first = buffer.size();

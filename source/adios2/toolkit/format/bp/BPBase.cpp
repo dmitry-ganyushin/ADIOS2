@@ -42,9 +42,10 @@ BPBase::BPBase(helper::Comm const &comm) : m_Comm(comm)
     m_Profiler.m_IsActive = true; // default
 }
 
-void BPBase::Init( const adiosParameters &allParameters, const Params &parameters, const std::string hint,
+void BPBase::Init( const adiosParameters &inParameters, const Params &parameters, const std::string hint,
                   const std::string engineType)
 {
+    allParameters = inParameters;
     // Parse Parameters
     struct Parameters parsedParameters;
     bool profilePresent = false;
@@ -253,7 +254,7 @@ void BPBase::Init( const adiosParameters &allParameters, const Params &parameter
 
     // set initial buffer size
     m_Profiler.Start("buffering");
-    m_Data.Resize(m_Parameters.InitialBufferSize, hint);
+    m_Data.Resize(allParameters.InitialBufferSize, hint);
     m_Profiler.Stop("buffering");
 }
 
@@ -263,7 +264,7 @@ BPBase::ResizeResult BPBase::ResizeBuffer(const size_t dataIn,
     m_Profiler.Start("buffering");
     const size_t currentSize = m_Data.m_Buffer.size();
     const size_t requiredSize = dataIn + m_Data.m_Position;
-    const size_t maxBufferSize = m_Parameters.MaxBufferSize;
+    const size_t maxBufferSize = allParameters.MaxBufferSize;
 
     ResizeResult result = ResizeResult::Unchanged;
 
@@ -297,7 +298,7 @@ BPBase::ResizeResult BPBase::ResizeBuffer(const size_t dataIn,
     {
         if (currentSize < maxBufferSize)
         {
-            const float growthFactor = m_Parameters.GrowthFactor;
+            const float growthFactor = allParameters.GrowthFactor;
             const size_t nextSize = std::min(
                 maxBufferSize, helper::NextExponentialSize(
                                    requiredSize, currentSize, growthFactor));

@@ -118,13 +118,13 @@ void BP3Serializer::PutSpanMetadata(
     const core::Variable<T> &variable,
     const typename core::Variable<T>::Span &span) noexcept
 {
-    if (m_Parameters.StatsLevel > 0)
+    if (allParameters.StatsLevel > 0)
     {
         // Get Min/Max from populated data
         m_Profiler.Start("minmax");
         T min, max;
         helper::GetMinMaxThreads(span.Data(), span.Size(), min, max,
-                                 m_Parameters.Threads);
+                                 allParameters.Threads);
         m_Profiler.Stop("minmax");
 
         // Put min/max in variable index
@@ -306,7 +306,7 @@ BP3Serializer::GetBPStats(const bool singleValue,
         return stats;
     }
 
-    if (m_Parameters.StatsLevel > 0)
+    if (allParameters.StatsLevel > 0)
     {
         m_Profiler.Start("minmax");
         if (blockInfo.MemoryStart.empty())
@@ -314,7 +314,7 @@ BP3Serializer::GetBPStats(const bool singleValue,
             const std::size_t valuesSize =
                 helper::GetTotalSize(blockInfo.Count);
             helper::GetMinMaxThreads(blockInfo.Data, valuesSize, stats.Min,
-                                     stats.Max, m_Parameters.Threads);
+                                     stats.Max, allParameters.Threads);
         }
         else // non-contiguous memory min/max
         {
@@ -476,7 +476,7 @@ void BP3Serializer::PutVariableMetadataInIndex(
     }
     else // update characteristics sets count
     {
-        if (m_Parameters.StatsLevel > 0)
+        if (allParameters.StatsLevel > 0)
         {
             ++index.Count;
             // fixed since group and path are not printed
@@ -501,7 +501,7 @@ void BP3Serializer::PutBoundsRecord(const bool singleValue,
     }
     else
     {
-        if (m_Parameters.StatsLevel > 0) // default verbose
+        if (allParameters.StatsLevel > 0) // default verbose
         {
             PutCharacteristicRecord(characteristic_min, characteristicsCounter,
                                     stats.Min, buffer);
@@ -530,7 +530,7 @@ void BP3Serializer::PutBoundsRecord(const bool singleValue,
     }
     else
     {
-        if (m_Parameters.StatsLevel > 0) // default min and max only
+        if (allParameters.StatsLevel > 0) // default min and max only
         {
             PutCharacteristicRecord(characteristic_min, characteristicsCounter,
                                     stats.Min, buffer, position);
@@ -617,7 +617,7 @@ void BP3Serializer::PutVariableCharacteristics(
 
     if (blockInfo.Data != nullptr || span != nullptr)
     {
-        if (m_Parameters.StatsLevel > 0 && span != nullptr)
+        if (allParameters.StatsLevel > 0 && span != nullptr)
         {
             span->m_MinMaxMetadataPositions.first = buffer.size() + 1;
             span->m_MinMaxMetadataPositions.second =

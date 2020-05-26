@@ -155,7 +155,7 @@ void BP4Reader::Init()
     /* Do a collective wait for the file(s) to appear within timeout.
        Make sure every process comes to the same conclusion */
     const Seconds timeoutSeconds =
-        Seconds(m_BP4Deserializer.m_Parameters.OpenTimeoutSecs);
+        Seconds(m_BP4Deserializer.allParameters.OpenTimeoutSecs);
 
     // set poll to 1/100 of timeout
     Seconds pollSeconds = timeoutSeconds / 100.0;
@@ -534,7 +534,7 @@ StepStatus BP4Reader::CheckForNewSteps(Seconds timeoutSeconds)
         std::chrono::steady_clock::now() + timeoutSeconds;
 
     auto pollSeconds =
-        Seconds(m_BP4Deserializer.m_Parameters.BeginStepPollingFrequencySecs);
+        Seconds(m_BP4Deserializer.allParameters.BeginStepPollingFrequencySecs);
     if (pollSeconds > timeoutSeconds)
     {
         pollSeconds = timeoutSeconds;

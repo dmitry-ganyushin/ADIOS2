@@ -103,7 +103,7 @@ size_t BP3Base::GetBPIndexSizeInData(const std::string &variableName,
     // characteristic statistics
     indexSize += 5; // count + length
     // default, only min and max and dimensions
-    if (m_Parameters.StatsLevel > 0)
+    if (allParameters.StatsLevel > 0)
     {
         indexSize += 2 * (2 * sizeof(uint64_t) + 1);
         indexSize += 1 + 1; // id

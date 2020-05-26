@@ -12,6 +12,7 @@
 #include "BP3Writer.tcc"
 
 #include "adios2/common/ADIOSMacros.h"
+#include "adios2/common/ADIOSTypes.h"
 #include "adios2/core/IO.h"
 #include "adios2/helper/adiosFunctions.h" //CheckIndexRange
 #include "adios2/toolkit/profiling/taustubs/tautimer.hpp"
@@ -93,7 +94,7 @@ void BP3Writer::EndStep()
     m_BP3Serializer.SerializeData(m_IO, true);
 
     const size_t currentStep = CurrentStep();
-    const size_t flushStepsCount = m_BP3Serializer.m_Parameters.FlushStepsCount;
+    const size_t flushStepsCount = m_BP3Serializer.allParameters.FlushStepsCount;
 
     if (currentStep % flushStepsCount == 0)
     {
@@ -107,7 +108,7 @@ void BP3Writer::Flush(const int transportIndex)
     DoFlush(false, transportIndex);
     m_BP3Serializer.ResetBuffer(m_BP3Serializer.m_Data);
 
-    if (m_BP3Serializer.m_Parameters.CollectiveMetadata)
+    if (m_BP3Serializer.allParameters.CollectiveMetadata)
     {
         WriteCollectiveMetadataFile();
     }
@@ -180,12 +181,12 @@ void BP3Writer::InitTransports()
 
     m_BP3Serializer.m_Profiler.Start("mkdir");
     m_FileDataManager.MkDirsBarrier(bpSubStreamNames,
-                                    m_BP3Serializer.m_Parameters.NodeLocal);
+                                    m_BP3Serializer.allParameters.NodeLocal);
     m_BP3Serializer.m_Profiler.Stop("mkdir");
 
     if (m_BP3Serializer.m_Aggregator.m_IsConsumer)
     {
-        if (m_BP3Serializer.m_Parameters.AsyncTasks)
+        if (m_BP3Serializer.allParameters.AsyncTasks)
         {
             for (size_t i = 0; i < m_IO.m_TransportsParameters.size(); ++i)
             {
@@ -241,7 +242,7 @@ void BP3Writer::DoClose(const int transportIndex)
         m_FileDataManager.CloseFiles(transportIndex);
     }
 
-    if (m_BP3Serializer.m_Parameters.CollectiveMetadata &&
+    if (m_BP3Serializer.allParameters.CollectiveMetadata &&
         m_FileDataManager.AllTransportsClosed())
     {
         WriteCollectiveMetadataFile(true);

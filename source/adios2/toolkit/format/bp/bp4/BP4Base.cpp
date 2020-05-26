@@ -153,11 +153,11 @@ size_t BP4Base::GetBPIndexSizeInData(const std::string &variableName,
 
     // characteristic statistics
     indexSize += 5; // count + length
-    if (m_Parameters.StatsLevel ==
+    if (allParameters.StatsLevel ==
         1) // default, only min and max and dimensions
     {
         const size_t nElems = helper::GetTotalSize(count);
-        const size_t nSubblocks = nElems / m_Parameters.StatsBlockSize;
+        const size_t nSubblocks = nElems / allParameters.StatsBlockSize;
         indexSize += 2 * (nSubblocks + 1) * (2 * sizeof(uint64_t) + 1);
         indexSize += dimensions * 2;
         indexSize += 1 + 2; // id + # of subblocks field

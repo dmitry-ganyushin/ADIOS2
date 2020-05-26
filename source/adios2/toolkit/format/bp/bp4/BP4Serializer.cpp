@@ -735,7 +735,7 @@ BP4Serializer::DeserializeIndicesPerRankThreads(
     const std::vector<char> &serialized, helper::Comm const &comm,
     const bool isRankConstant) const noexcept
 {
-    if (m_Parameters.Threads == 1)
+    if (allParameters.Threads == 1)
     {
         return BP4Serializer::DeserializeIndicesPerRankSingleThread(
             serialized, comm, isRankConstant);
@@ -790,16 +790,16 @@ BP4Serializer::DeserializeIndicesPerRankThreads(
 
     size_t serializedPosition = 0;
 
-    std::vector<std::future<void>> asyncs(m_Parameters.Threads);
-    std::vector<size_t> asyncPositions(m_Parameters.Threads);
-    std::vector<int> asyncRankSources(m_Parameters.Threads);
+    std::vector<std::future<void>> asyncs(allParameters.Threads);
+    std::vector<size_t> asyncPositions(allParameters.Threads);
+    std::vector<int> asyncRankSources(allParameters.Threads);
 
     bool launched = false;
 
     while (serializedPosition < serializedSize)
     {
         // extract rank and index buffer size
-        for (unsigned int t = 0; t < m_Parameters.Threads; ++t)
+        for (unsigned int t = 0; t < allParameters.Threads; ++t)
         {
             if (serializedPosition >= serializedSize)
             {
@@ -1727,7 +1727,7 @@ void BP4Serializer::MergeSerializeIndicesPerStep(
     };
 
     // BODY OF FUNCTION STARTS HERE
-    if (m_Parameters.Threads == 1) // enforcing serial version for now
+    if (allParameters.Threads == 1) // enforcing serial version for now
     {
         for (const auto &rankIndices : nameRankIndices)
         {
@@ -1739,12 +1739,12 @@ void BP4Serializer::MergeSerializeIndicesPerStep(
     // TODO need to debug this part, if threaded per variable
     const size_t elements = nameRankIndices.size();
     const size_t stride =
-        elements / m_Parameters.Threads; // elements per thread
+        elements / allParameters.Threads; // elements per thread
     const size_t last =
-        stride + elements % m_Parameters.Threads; // remainder to last
+        stride + elements % allParameters.Threads; // remainder to last
 
     std::vector<std::thread> threads;
-    threads.reserve(m_Parameters.Threads);
+    threads.reserve(allParameters.Threads);
 
     // copy names in order to use threads
     std::vector<std::string> names;
@@ -1755,12 +1755,12 @@ void BP4Serializer::MergeSerializeIndicesPerStep(
         names.push_back(nameRankIndexPair.first);
     }
 
-    for (unsigned int t = 0; t < m_Parameters.Threads; ++t)
+    for (unsigned int t = 0; t < allParameters.Threads; ++t)
     {
         const size_t start = stride * t;
         size_t end = start + stride;
 
-        if (t == m_Parameters.Threads - 1)
+        if (t == allParameters.Threads - 1)
         {
             end = start + last;
         }

@@ -226,7 +226,7 @@ void BP3Deserializer::ParseVariablesIndex(const BufferSTL &bufferSTL,
     const size_t varIndexLength =
         m_Minifooter.AttributesIndexStart - m_Minifooter.VarsIndexStart - 12;
 
-    if (m_Parameters.Threads == 1)
+    if (allParameters.Threads == 1)
     {
         while (localPosition < varIndexLength)
         {
@@ -242,15 +242,15 @@ void BP3Deserializer::ParseVariablesIndex(const BufferSTL &bufferSTL,
     }
 
     // threads for reading Variables
-    std::vector<std::future<void>> asyncs(m_Parameters.Threads);
-    std::vector<size_t> asyncPositions(m_Parameters.Threads);
+    std::vector<std::future<void>> asyncs(allParameters.Threads);
+    std::vector<size_t> asyncPositions(allParameters.Threads);
 
     bool launched = false;
 
     while (localPosition < varIndexLength)
     {
         // extract async positions
-        for (unsigned int t = 0; t < m_Parameters.Threads; ++t)
+        for (unsigned int t = 0; t < allParameters.Threads; ++t)
         {
             asyncPositions[t] = position;
             const size_t elementIndexSize =

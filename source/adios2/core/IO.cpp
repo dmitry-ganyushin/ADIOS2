@@ -27,6 +27,7 @@
 #include "adios2/engine/nullcore/NullCoreWriter.h"
 #include "adios2/engine/skeleton/SkeletonReader.h"
 #include "adios2/engine/skeleton/SkeletonWriter.h"
+#include "adios2/toolkit/format/bp/BPBase.h"
 
 #include "adios2/helper/adiosComm.h"
 #include "adios2/helper/adiosFunctions.h" //BuildParametersMap
