@@ -4,102 +4,17 @@
 
 #include <adios2.h>
 #include <chrono>
-#include <ios>      //std::ios_base::failure
-#include <iostream> //std::cout
+#include <ios>
+#include <iostream>
 #include <queue>
 #include <set>
 #include <stack>
-#include <stdexcept> //std::invalid_argument std::exception
+#include <stdexcept>
 #include <vector>
 
 #if ADIOS2_USE_MPI
 #include <mpi.h>
 #endif
-
-bool endsWith(const std::string &s, const std::string &suffix)
-{
-    return s.find(suffix, s.size() - suffix.size()) != std::string::npos;
-}
-
-bool startsWith(const std::string &s, const std::string &prefix)
-{
-    return s.rfind(prefix, 0) == 0;
-}
-
-void TraverseBreadthSearchFirst(adios2::Group &g)
-{
-    int numberOfGroups = 0;
-    int numberOfVariables = 0;
-    std::queue<std::string> queue;
-    std::string root = g.InquirePath();
-    queue.push(root);
-
-    while (!queue.empty())
-    {
-        int levelSize = queue.size();
-        for (int i = 0; i < levelSize; i++)
-        {
-            std::string currentNode = queue.front();
-            queue.pop();
-            // add the node to the current level
-            g.setPath(currentNode);
-            std::vector<std::string> groups = g.AvailableGroups();
-
-            numberOfGroups += groups.size();
-
-            std::vector<std::string> variables = g.AvailableVariables();
-            numberOfVariables += variables.size();
-
-            // insert the children of current node in the queue
-            for (auto v : groups)
-            {
-                queue.push(currentNode + "/" + v);
-            }
-        }
-    }
-    std::cout << "Number of groups " << numberOfGroups << std::endl;
-    std::cout << "Number of variables " << numberOfVariables << std::endl;
-    return;
-}
-
-void TraverseDepthSearchFirst(adios2::Group &g)
-{
-    int numberOfGroups = 0;
-    int numberOfVariables = 0;
-    std::stack<std::string> stack;
-    std::string root = g.InquirePath();
-    stack.push(root);
-
-    while (!stack.empty())
-    {
-
-        std::set<std::string> visited;
-
-        // Pop a vertex from stack and print it
-        std::string currentNode = stack.top();
-        stack.pop();
-
-        if (visited.find(currentNode) == visited.end())
-        {
-            g.setPath(currentNode);
-            std::vector<std::string> groups = g.AvailableGroups();
-            numberOfGroups += groups.size();
-
-            std::vector<std::string> variables = g.AvailableVariables();
-            numberOfVariables += variables.size();
-            visited.insert(currentNode);
-
-            // insert the children of current node in the queue
-            for (auto v : groups)
-            {
-                stack.push(currentNode + "/" + v);
-            }
-        }
-    }
-    std::cout << "Number of groups " << numberOfGroups << std::endl;
-    std::cout << "Number of variables " << numberOfVariables << std::endl;
-    return;
-}
 
 int main(int argc, char *argv[])
 {
@@ -141,22 +56,22 @@ int main(int argc, char *argv[])
          * count
          * (local) }, all are constant dimensions */
 
-        adios2::Variable<float> bpFloats =
-            bpIO.DefineVariable<float>("group1/subgroup1/bpFloats/__data__", {size * Nx},
-                                       {rank * Nx}, {Nx}, adios2::ConstantDims);
-        adios2::Variable<int> bpInts =
-            bpIO.DefineVariable<int>("group1/subgroup1/bpInts/__data__", {size * Nx},
-                                     {rank * Nx}, {Nx}, adios2::ConstantDims);
+        adios2::Variable<float> bpFloats = bpIO.DefineVariable<float>(
+            "group1/subgroup1/bpFloats/__data__", {size * Nx}, {rank * Nx},
+            {Nx}, adios2::ConstantDims);
+        adios2::Variable<int> bpInts = bpIO.DefineVariable<int>(
+            "group1/subgroup1/bpInts/__data__", {size * Nx}, {rank * Nx}, {Nx},
+            adios2::ConstantDims);
 
         for (int i = 0; i < number_of_steps; i++)
         {
             bpFileWriter.BeginStep();
 
             /** Put variables for buffering, template type is optional */
-            if (i%2 == 0){
+            if (i % 2 == 0)
+            {
                 bpFileWriter.Put<float>(bpFloats, myFloats.data());
             }
-
 
             bpFileWriter.Put(bpInts, myInts.data());
 
@@ -197,8 +112,6 @@ int main(int argc, char *argv[])
 
     try
     {
-        /** ADIOS class factory of IO class objects */
-        // adios2::ADIOS adios(MPI_COMM_WORLD);
 #if ADIOS2_USE_MPI
         adios2::ADIOS adios(MPI_COMM_WORLD);
 #else
@@ -261,7 +174,6 @@ int main(int argc, char *argv[])
             std::cout << std::endl
                       << "********************************" << std::endl;
 
-
             adios2::Group g2 = g1.OpenGroup("bpFloats");
             std::cout << "****Path of g2 ***" << g2.InquirePath() << std::endl;
             std::cout << "****Available variables*********" << std::endl;
@@ -277,7 +189,6 @@ int main(int argc, char *argv[])
                 std::cout << v << " ";
             std::cout << std::endl
                       << "********************************" << std::endl;
-
 
             adios2::Group g3 = g1.OpenGroup("bpInts");
             std::cout << "****Path of g3 ***" << g3.InquirePath() << std::endl;
@@ -301,7 +212,7 @@ int main(int argc, char *argv[])
             adios2::Variable<int> bpInts = g3.InquireVariable<int>("__data__");
 
             const std::size_t Nx = 10;
-            if (bpFloats) // means found
+            if (bpFloats)
             {
                 std::vector<float> myFloats;
 
@@ -321,7 +232,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (bpInts) // means not found
+            if (bpInts)
             {
                 std::vector<int> myInts;
                 // read only the chunk corresponding to our rank
